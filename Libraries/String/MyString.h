@@ -1,7 +1,13 @@
 #pragma once
 #include <cassert>
-#include "Const.h"
-#include "StringAlg.h"
+#include "Helper.h"
+
+const int STRING_UPSIZE_BY = 2;
+const int STRING_DEFAULT_CAP = 4;
+const int STRING_DOWNSIZE_BY = 4;
+const int STRING_CIN_BUFF_SIZE = 1024;
+
+const int CHAR_SIZE = 256;
 
 class String{
 private:
@@ -62,6 +68,14 @@ public:
     bool operator>=(const String& other) const;
     bool operator<(const String& other) const;
     bool operator>(const String& other) const;
+
+    bool operator==(const char* other) const; //Boolean Operations
+    bool operator!=(const char* other) const;
+    bool operator<=(const char* other) const;
+    bool operator>=(const char* other) const;
+    bool operator<(const char* other) const;
+    bool operator>(const char* other) const;
+
     bool empty() const;
     operator bool() const;
     int compare(const String& other) const;
@@ -75,7 +89,7 @@ public:
 
 private: 
 
-    void shortCopy(const char* string, size_t size);
+    void shortCopy(const char* string, size_t size = sizeof(String));
     void shortCopy(const String& other);
     void copyFrom(const char* string);
     void copyFrom(const String& other);
@@ -98,8 +112,8 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& os, const String& str);
-std::istream& operator>>(std::istream& is, const String& str);
+std::istream& operator>>(std::istream& is, String& str);
 
-std::istream& getline(std::istream& is, String& str, char delim);
+std::istream& getline(std::istream& is, String& str, char delim = '\n');
 
 String operator+ (const String& lhs, const String& rhs);

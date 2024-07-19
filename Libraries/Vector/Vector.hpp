@@ -1,19 +1,23 @@
 #pragma once
 #include <initializer_list>
 #include <iostream>
-#include "RAReverseIter.hpp"
-#include "Const.h"
+#include "../Iterator\RandomAccess\RAReverseIter.hpp"
+
+static const int VECTOR_UPSIZE_BY = 2;
+static const int VECTOR_DOWNSIZE_BY = 4;
+static const int VECTOR_DEFAULT_SIZE = 8;
+
 
 template <typename T>
 class Vector{
 public:
-    class Iterator: public RABaseIter{ };
+    class Iterator: public RABaseIter<T>{ };
 
-    class ConstIterator: public RABaseCIter{ };
+    class ConstIterator: public RABaseCIter<T>{ };
 
-    class RIterator : public RABaseRIter{ };
+    class RIterator : public RABaseRIter<T>{ };
 
-    class ConstRIterator : public RABaseCRiter { };
+    class ConstRIterator : public RABaseCRiter<T>{ };
 
 private:
 
@@ -52,10 +56,11 @@ public:
     void reserve(size_t number);
 
     void push_back(const T& newData);   //Data modifications
+    void push_back(T&& newData);
     void pop_back();
-    void insert(size_t index, const T& toInsert);
-    void erase(size_t index);
-    void swap(size_t index1, size_t index2);
+    void insert(size_t index, const T& toInsert);//iterator supp
+    void erase(size_t index);   //iterator supp
+    void swap(size_t index1, size_t index2);    //iterator supp
     void clear() noexcept;
 
     Iterator end();     //Iterators
@@ -86,7 +91,7 @@ template <typename T>
 Vector<T>::Vector(){
     _data = nullptr;
     _size = 0;
-    _capacity = DEFAULT_SIZE;
+    _capacity = VECTOR_DEFAULT_SIZE;
 }
 
 template <typename T>
@@ -95,12 +100,12 @@ Vector<T>::Vector(size_t _size): Vector(_size, T()){}
 template <typename T>
 Vector<T>::Vector(size_t size, const T& fill){
     _size = size;
-    _capacity = _size * UPSIZE_BY;
+    _capacity = _size * VECTOR_UPSIZE_BY;
     _data = new T[_capacity];
     for(size_t i {0}; i < size;i++){
         _data[i] = fill;
     }
-
+    
 }
 template <typename T>
 Vector<T>::~Vector(){
@@ -137,7 +142,7 @@ Vector<T>& Vector<T>::operator=(Vector<T>&& other)noexcept{
 template <typename T>
 Vector<T>::Vector(const std::initializer_list<T>& initList){
     _size = initList.size();
-    _capacity = _size * UPSIZE_BY;
+    _capacity = _size * VECTOR_UPSIZE_BY;
     _data = new T[_capacity];
     for(size_t i {0}; i < _size; i++){
         _data[i] = initList[i];
@@ -206,9 +211,10 @@ template <typename T>
 void Vector<T>::resize(size_t size, const T& fill){
 
 
+    _capacity = size * VECTOR_UPSIZE_BY;
 
     T* temp = new T [_capacity];
-    for(size_t i {0}; i < (_size > size)? size : _size; i++){
+    for(size_t i {0}; i <((_size > size)? size : _size); i++){
         if(i > _size){
             temp[i] = fill;
         }
@@ -216,10 +222,10 @@ void Vector<T>::resize(size_t size, const T& fill){
             temp[i] = _data[i];
     }
 
+    _size = (_size > size)? size : _size;
     delete[] _data;
-    _size = size;
-    _capacity = _size * UPSIZE_BY;
     _data = temp;
+
 }
 template <typename T>
 size_t Vector<T>::size() const{
@@ -243,8 +249,8 @@ template <typename T>
 void Vector<T>::push_back(const T& new_data){
 
     if(_data == nullptr){
-        _capacity = DEFAULT_SIZE;
-        _data = new T[DEFAULT_SIZE];
+        _capacity = VECTOR_DEFAULT_SIZE;
+        _data = new T[VECTOR_DEFAULT_SIZE];
     }
 
     if(_size == _capacity){
@@ -255,10 +261,25 @@ void Vector<T>::push_back(const T& new_data){
 }
 
 template <typename T>
+void Vector<T>::push_back(T&& new_data){
+
+    if(_data == nullptr){
+        _capacity = VECTOR_DEFAULT_SIZE;
+        _data = new T[VECTOR_DEFAULT_SIZE];
+    }
+
+    if(_size == _capacity){
+        _capacity *= 2;
+        resize(_capacity);
+    }
+    _data[_size++] = std::move(new_data);
+}
+
+template <typename T>
 void Vector<T>::pop_back(){
     _size--;  
-    if(_size < _capacity / DOWNSIZE_BY){
-        resize(_capacity / UPSIZE_BY);
+    if(_size < _capacity / VECTOR_DOWNSIZE_BY){
+        resize(_capacity / VECTOR_UPSIZE_BY);
     }  
 }
 
@@ -273,7 +294,7 @@ void Vector<T>::clear() noexcept{
 template <typename T>
 void Vector<T>::insert(size_t index, const T& toInsert){
     if(_size == _capacity){
-        resize(_capacity * UPSIZE_BY);
+        resize(_capacity * VECTOR_UPSIZE_BY);
     }
     for(size_t i = _size ; i > index; i--){
         T& temp = _data[i];
@@ -347,12 +368,12 @@ Vector<T>::ConstRIterator Vector<T>::crbegin() const{
 
 template <typename T>
 void Vector<T>::copyFrom(const Vector<T>& other){
-    _data = new T[other.capacity];
+    _data = new T[other.capacity()];
     for(size_t i {0}; i < other._size; i++){
         _data[i] = other._data[i];
     }
     _size = other._size;
-    _capacity = other.capacity;
+    _capacity = other.capacity();
 }
 
 template <typename T>

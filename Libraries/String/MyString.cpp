@@ -13,9 +13,9 @@ String::String(const char* content){
 
     else{   //normal initialization
         setSize(len + 1);
-        _data = new char[size() * UPSIZE_BY];
+        _data = new char[size() * STRING_UPSIZE_BY];
         strcopy(_data, content);
-        setCapacity(size() * UPSIZE_BY);
+        setCapacity(size() * STRING_UPSIZE_BY);
     }
 }
 String::String(size_t capacity){
@@ -127,7 +127,7 @@ void String::resize(size_t size){
     }
     _data = newData;
     setSize(size);
-    setCapacity(size * UPSIZE_BY);
+    setCapacity(size * STRING_UPSIZE_BY);
 
 }
 void String::clear(){
@@ -201,7 +201,7 @@ String& String::operator+=(const String& other){
         strconcat(data(), other.data());    //if we have the capacity we just concatenate
     }
     else{
-        char* newString = new char[(size() + other.size() + 1) * UPSIZE_BY];
+        char* newString = new char[(size() + other.size() + 1) * STRING_UPSIZE_BY];
         strcopy(newString, data());
         strconcat(newString, other.data()); //else we create a new string and make it the concatenation of our two
 
@@ -210,7 +210,7 @@ String& String::operator+=(const String& other){
         
         _data = newString;
         setSize(size() + other.size());
-        setCapacity(size() * UPSIZE_BY);
+        setCapacity(size() * STRING_UPSIZE_BY);
     }
     
     return *this;
@@ -223,7 +223,7 @@ String& String::append(const String& other){
 
 String& String::push_back(char c){
     if(size() == capacity())
-        resize(capacity() * UPSIZE_BY);
+        resize(capacity() * STRING_UPSIZE_BY);
     
     (*this)[_size++] = c;
     return *this;
@@ -243,8 +243,8 @@ void String::swap(String& other){
 
 void String::pop_back(){
     _data[_size--] = '\0';
-    if(_size < _capacity / DOWNSIZE_BY){
-        resize(_capacity / UPSIZE_BY);
+    if(_size < _capacity / STRING_DOWNSIZE_BY){
+        resize(_capacity / STRING_UPSIZE_BY);
     }
 }
 
@@ -259,7 +259,7 @@ String String::substr(size_t startpos, size_t len = nopos){
         return str;
     }
 
-    str.setCapacity(len * UPSIZE_BY);   //else we create a new string and return it
+    str.setCapacity(len * STRING_UPSIZE_BY);   //else we create a new string and return it
     char* newStr = new char[str.capacity()];
     strcopy_s(newStr, len,  data() + startpos);
     str._data = newStr;
@@ -291,6 +291,26 @@ bool String::operator<(const String& other) const{
 bool String::operator>(const String& other) const{
     return(strcomp(data(), other.data()) >= 0); 
 }
+
+bool String::operator==(const char* other) const{
+    return(strcomp(data(), other) == 0);
+}
+bool String::operator!=(const char* other) const{
+    return(strcomp(data(), other) != 0);
+}
+bool String::operator<=(const char* other) const{
+    return(strcomp(data(), other) <= 0);
+}
+bool String::operator>=(const char* other) const{
+    return(strcomp(data(), other) >= 0); 
+}
+bool String::operator<(const char* other) const{
+    return(strcomp(data(), other) <= 0);
+}
+bool String::operator>(const char* other) const{
+    return(strcomp(data(), other) >= 0); 
+}
+
 bool String::empty() const{
     return size() == 0;
 }
@@ -305,18 +325,18 @@ std::ostream& operator<<(std::ostream& os, const String& str){
 
 std::istream& operator>>(std::istream& is, String& str){
 
-    char buffer[CIN_BUFF_SIZE];
+    char buffer[STRING_CIN_BUFF_SIZE];
 
     is>>buffer;
     str = buffer;
     return is;
 }
 
-std::istream& getline(std::istream& is, String& str, char delim = '\n'){
+std::istream& getline(std::istream& is, String& str, char delim){
     
-    char buffer[CIN_BUFF_SIZE];
+    char buffer[STRING_CIN_BUFF_SIZE];
 
-    is.getline(buffer, CIN_BUFF_SIZE, delim);
+    is.getline(buffer, STRING_CIN_BUFF_SIZE, delim);
     str = buffer;
     return is;
 
@@ -324,7 +344,7 @@ std::istream& getline(std::istream& is, String& str, char delim = '\n'){
 
 String operator+ (const String& lhs, const String& rhs){
     size_t newsize = (lhs.size() + rhs.size() + 1);
-    newsize = (newsize < sizeof(String))? newsize : newsize * UPSIZE_BY;    //if the new string can be stored as a short string
+    newsize = (newsize < sizeof(String))? newsize : newsize * STRING_UPSIZE_BY;    //if the new string can be stored as a short string
                                                                             //we will not upsize it so we can not use dynamic memory allocation
     String newString (newsize);
     strcopy(newString.data(), lhs.data());
@@ -344,6 +364,7 @@ void String::free() noexcept {
 void String::copyFrom(const String& other){
     if(other.isShort()){
         shortCopy(other);
+        return;
     }
 
     setCapacity(other.capacity());
@@ -355,10 +376,12 @@ void String::copyFrom(const String& other){
 void String::copyFrom(const char* string){  //overload so we do not go trough converting constructor
 
     size_t strsize = strleng(string);
-    if(strsize < sizeof(String))
-        shortCopy(string);
+    if(strsize < sizeof(String)){
+        shortCopy(string, strsize);
+        return;
+    }
 
-    setCapacity(strsize * UPSIZE_BY);
+    setCapacity(strsize * STRING_UPSIZE_BY);
     _data = new char[capacity()];
     strcopy_s(_data, strsize, string);
     setSize(strsize);
