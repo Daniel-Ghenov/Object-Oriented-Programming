@@ -1,9 +1,7 @@
 #pragma once
-#include "BiDirectional\BiDirectIter.hpp"
+#include "../BiDirectional\BiDirectIter.hpp"
 template <typename T>
-class RABaseIter: public BiDirectIter{
-protected:
-    T* _ptr = nullptr;
+struct RABaseIter: public BiDirectIter<T>{
 public:
     RABaseIter() = default;
     RABaseIter(T* ptr);
@@ -17,9 +15,7 @@ public:
 };
 
 template <typename T>
-class RABaseCIter: public CBiDirectIter{
-protected:
-    const T* _ptr = nullptr;
+struct RABaseCIter: public CBiDirectIter<T>{
 public:
     RABaseCIter() = default;
     RABaseCIter(T* ptr);
@@ -33,26 +29,26 @@ public:
 };
 
 template <typename T>
-RABaseIter<T>::RABaseIter(T* ptr): BiDirectIter(ptr){
+RABaseIter<T>::RABaseIter(T* ptr): BiDirectIter<T>(ptr){
 }
 template <typename T>
 RABaseIter<T>& RABaseIter<T>::operator+=(int offset){
-    _ptr += offset;
+    this->_ptr += offset;
     return *this;
 }
 template <typename T>
 RABaseIter<T>& RABaseIter<T>::operator-=(int offset){
-    _ptr -= offset;
+    this->_ptr -= offset;
     return *this;
 }
 template <typename T>
 RABaseIter<T> RABaseIter<T>::operator+(int offset){
-    return RABaseIter<T>(_ptr + offset);
+    return RABaseIter<T>(this->_ptr + offset);
 }
 
 template <typename T>
 RABaseIter<T> RABaseIter<T>::operator-(int offset){  
-    return RABaseIter<T>(_ptr - offset);
+    return RABaseIter<T>(this->_ptr - offset);
 }
 
 
@@ -60,32 +56,32 @@ RABaseIter<T> RABaseIter<T>::operator-(int offset){
 
 
 template <typename T>
-RABaseCIter<T>::RABaseCIter(T* ptr): CBiDirectIter(ptr){
+RABaseCIter<T>::RABaseCIter(T* ptr): CBiDirectIter<T>(ptr){
 
 }
 template <typename T>
-RABaseCIter<T>::RABaseCIter(const RABaseIter<T>& other): _ptr(other._ptr){
+RABaseCIter<T>::RABaseCIter(const RABaseIter<T>& other): CBiDirectIter<T>(other._ptr){
 
 }
 
 template <typename T>
 RABaseCIter<T>& RABaseCIter<T>::operator+=(int offset){
-    _ptr += offset;
+    this->_ptr += offset;
     return *this;
 }
 template <typename T>
 RABaseCIter<T>& RABaseCIter<T>::operator-=(int offset){
-    _ptr -= offset;
+    this->_ptr -= offset;
     return *this;
 }
 
 template <typename T>
 RABaseCIter<T> RABaseCIter<T>::operator+(int offset){
-    return RABaseCIter<T>(_ptr + offset);
+    return RABaseCIter<T>(this->_ptr + offset);
 }
 template <typename T>
 RABaseCIter<T> RABaseCIter<T>::operator-(int offset){
-    return RABaseCIter<T>(_ptr - offset);
+    return RABaseCIter<T>(this->_ptr - offset);
 
 }
 

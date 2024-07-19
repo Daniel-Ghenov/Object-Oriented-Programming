@@ -1,8 +1,8 @@
 #pragma once
-#include "RandomAccess\RABaseIter.hpp"
+#include "RABaseIter.hpp"
 
 template <typename T>
-class RABaseRIter : public RABaseIter{
+class RABaseRIter : public RABaseIter<T>{
 public:
     RABaseRIter() = default;
     RABaseRIter(T* ptr);
@@ -32,7 +32,7 @@ public:
 };
 
 template <typename T>
-class RABaseCRiter :public RABaseCIter{
+class RABaseCRiter :public RABaseCIter<T>{
     RABaseCRiter() = default;
     RABaseCRiter(T* ptr);       
     RABaseCRiter(const RABaseCIter<T>& other);
@@ -61,184 +61,184 @@ class RABaseCRiter :public RABaseCIter{
 };
 
 template <typename T>
-RABaseRIter<T>::RABaseRIter(T* ptr): RABaseIter(ptr){
+RABaseRIter<T>::RABaseRIter(T* ptr): RABaseIter<T>(ptr){
 }
 template <typename T>
-RABaseRIter<T>::RABaseRIter(const RABaseIter<T>& other): RABaseIter(other._ptr - 1){
+RABaseRIter<T>::RABaseRIter(const RABaseIter<T>& other): RABaseIter<T>(other._ptr - 1){
 
 }
 
 template <typename T>
 RABaseRIter<T>& RABaseRIter<T>::operator++(){
-    _ptr--;
+    this->_ptr--;
     return *this;
 }
 template <typename T>
 RABaseRIter<T>& RABaseRIter<T>::operator--(){
-    _ptr++;
+    this->_ptr++;
     return *this;
 }
 template <typename T>
 RABaseRIter<T> RABaseRIter<T>::operator++(int a){
-    _ptr--;
-    return (RABaseRIter<T>((_ptr)  + 1));
+    this->_ptr--;
+    return (RABaseRIter<T>((this->_ptr)  + 1));
 }
 template <typename T>
 RABaseRIter<T> RABaseRIter<T>::operator--(int a){
-    _ptr++;
-    return (RABaseRIter<T>((_ptr) - 1));
+    this->_ptr++;
+    return (RABaseRIter<T>((this->_ptr) - 1));
 }
 template <typename T>
 RABaseRIter<T>& RABaseRIter<T>::operator+=(int offset){
-    _ptr -= offset;
+    this->_ptr -= offset;
     return *this;
 }
 template <typename T>
 RABaseRIter<T>& RABaseRIter<T>::operator-=(int offset){
-    _ptr += offset;
+    this->_ptr += offset;
     return *this;
 }
 template <typename T>
 RABaseRIter<T> RABaseRIter<T>::operator+(int offset){
-    return RABaseRIter<T>(_ptr - offset);
+    return RABaseRIter<T>(this->_ptr - offset);
 
 }
 template <typename T>
 RABaseRIter<T> RABaseRIter<T>::operator-(int offset){
-    return RABaseRIter<T>(_ptr + offset);
+    return RABaseRIter<T>(this->_ptr + offset);
 }
 template <typename T>
 bool RABaseRIter<T>::operator>(const RABaseRIter<T>& other){
-    return _ptr < other._ptr;
+    return this->_ptr < other._ptr;
 }
 template <typename T>
 bool RABaseRIter<T>::operator>=(const RABaseRIter<T>& other){
-    return _ptr <= other._ptr;
+    return this->_ptr <= other._ptr;
 
 }
 template <typename T>
 bool RABaseRIter<T>::operator<=(const RABaseRIter<T>& other){
-    return _ptr >= other._ptr;
+    return this->_ptr >= other._ptr;
 }
 template <typename T>
 bool RABaseRIter<T>::operator<(const RABaseRIter<T>& other){
-    return _ptr > other._ptr;
+    return this->_ptr > other._ptr;
 
 }
 template <typename T>
 bool RABaseRIter<T>::operator==(const RABaseRIter<T>& other){
-    return _ptr == other._ptr;
+    return this->_ptr == other._ptr;
 }
 template <typename T>
 bool RABaseRIter<T>::operator!=(const RABaseRIter<T>& other){
-    return _ptr != other._ptr;
+    return this->_ptr != other._ptr;
 }
 
 template <typename T>
 const T& RABaseRIter<T>::operator*() const{
-    return *(_ptr - 1)
+    return *(this->_ptr - 1);
 }
 template <typename T>
 T& RABaseRIter<T>::operator*(){
-    return *(_ptr - 1)
+    return *(this->_ptr - 1);
 }
 template <typename T>
 T* RABaseRIter<T>::operator->(){
-    return *(_ptr - 1)
+    return *(this->_ptr - 1);
 }
 //Const Iter
 
 
 template <typename T>
-RABaseCRiter<T>::RABaseCRiter(T* ptr): RABaseCIter(ptr){
+RABaseCRiter<T>::RABaseCRiter(T* ptr): RABaseCIter<T>(ptr){
     
 }       
 
 template <typename T>
-RABaseCRiter<T>::RABaseCRiter(const RABaseCIter<T>& other): RABaseCIter(other._ptr - 1){
+RABaseCRiter<T>::RABaseCRiter(const RABaseCIter<T>& other): RABaseCIter<T>(other._ptr - 1){
     
 }
 template <typename T>
-RABaseCRiter<T>::RABaseCRiter(const RABaseRIter<T>& other): RABaseCIter(other){
+RABaseCRiter<T>::RABaseCRiter(const RABaseRIter<T>& other): RABaseCIter<T>(other){
 
 }
 
 template <typename T>
 RABaseCRiter<T>& RABaseCRiter<T>::operator++(){
-    _ptr--;
+    this->_ptr--;
     return *this;
 }
 template <typename T>
 RABaseCRiter<T>& RABaseCRiter<T>::operator--(){
-    _ptr++;
+    this->_ptr++;
     return *this;
 }
 template <typename T>
 RABaseCRiter<T> RABaseCRiter<T>::operator++(int a){
-    _ptr--;
-    return CIterator(_ptr + 1);
+    this->_ptr--;
+    return CIterator(this->_ptr + 1);
 }
 template <typename T>
 RABaseCRiter<T> RABaseCRiter<T>::operator--(int a){
-    _ptr++;
-    return CIterator(_ptr - 1);
+    this->_ptr++;
+    return CIterator(this->_ptr - 1);
 }
 template <typename T>
 RABaseCRiter<T>& RABaseCRiter<T>::operator+=(int offset){
-    _ptr -= offset;
+    this->_ptr -= offset;
     return *this;
 }
 template <typename T>
 RABaseCRiter<T>& RABaseCRiter<T>::operator-=(int offset){
-    _ptr += offset;
+    this->_ptr += offset;
     return *this;
 }
 template <typename T>
 RABaseCRiter<T> RABaseCRiter<T>::operator+(int offset){
-    return CIterator(_ptr - offset);
+    return CIterator(this->_ptr - offset);
     
 }
 template <typename T>
 RABaseCRiter<T> RABaseCRiter<T>::operator-(int offset){
-    return CIterator(_ptr + offset);
+    return CIterator(this->_ptr + offset);
     
 }
 template <typename T>
 bool RABaseCRiter<T>::operator>(const RABaseCRiter<T>& other){
-    return _ptr < other._ptr;
+    return this->_ptr < other._ptr;
     
 }
 template <typename T>
 bool RABaseCRiter<T>::operator>=(const RABaseCRiter<T>& other){
-    return _ptr <= other._ptr;
+    return this->_ptr <= other._ptr;
     
 }
 template <typename T>
 bool RABaseCRiter<T>::operator<=(const RABaseCRiter<T>& other){
-    return _ptr >= other._ptr;
+    return this->_ptr >= other._ptr;
     
 }
 template <typename T>
 bool RABaseCRiter<T>::operator<(const RABaseCRiter<T>& other){
-    return _ptr > other._ptr;
+    return this->_ptr > other._ptr;
     
 }
 template <typename T>
 bool RABaseCRiter<T>::operator==(const RABaseCRiter<T>& other){
-    return _ptr == other._ptr;
+    return this->_ptr == other._ptr;
     
 }
 template <typename T>
 bool RABaseCRiter<T>::operator!=(const RABaseCRiter<T>& other){
-    return _ptr != other._ptr;
+    return this->_ptr != other._ptr;
     
 }
 
 template <typename T>
 const T& RABaseCRiter<T>::operator*() const{
-    return *(_ptr - 1)
+    return *(this->_ptr - 1);
 }
 template <typename T>
 const T* RABaseCRiter<T>::operator->(){
-    return *(_ptr - 1)
+    return *(this->_ptr - 1);
 }
